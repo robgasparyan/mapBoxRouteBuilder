@@ -2,4 +2,5 @@
     <string name="app_name">Map Box Route Builder</string>
     <string name="mapbox_access_token"></string>
     <string name="mapbox_style"></string>
+    <string name="new_location">newLocation</string>
 </resources>

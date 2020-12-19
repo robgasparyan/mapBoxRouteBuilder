@@ -2,12 +2,15 @@ package com.mapbox.mapboxroutebuilder.ViewModels
 
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
+import com.mapbox.mapboxroutebuilder.Repositories.BoxRepository
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
 
-class BoxViewModel : ViewModel() {
+class BoxViewModel(private val boxRepository: BoxRepository) : ViewModel() {
+
+    fun getCarsList() = boxRepository.getCarsList()
 
     private fun changeCameraPosition(
         mapBox: MapboxMap,
