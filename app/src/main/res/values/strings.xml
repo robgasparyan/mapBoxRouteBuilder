@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Map Box Route Builder</string>
-    <string name="mapbox_access_token"></string>
-    <string name="mapbox_style"></string>
+    <string name="mapbox_access_token">pk.eyJ1IjoiYmVsa2FjYXIiLCJhIjoiY2tkajg3anAyMGM3NzJ2bGhkMXJjZ213bCJ9.XIzfKyb_S9Mhu1-nU96fIQ</string>
+    <string name="mapbox_style">mapbox://styles/belkacar/ckdj89h8c0rk61jlgb850lece</string>
     <string name="new_location">newLocation</string>
 </resources>

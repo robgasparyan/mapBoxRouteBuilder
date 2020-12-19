@@ -1,13 +1,17 @@
 package com.mapbox.mapboxroutebuilder
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
 import android.view.animation.BounceInterpolator
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
-import com.mapbox.mapboxroutebuilder.ViewModels.BoxViewModel
+import com.mapbox.mapboxroutebuilder.utils.MapBoxHelper
+import com.mapbox.mapboxroutebuilder.viewModels.BoxViewModel
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -21,6 +25,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -28,7 +33,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListene
 
     private var mapView: MapView? = null
     private val boxViewModel: BoxViewModel by viewModel()
-    private var mapboxMap: MapboxMap? = null
+    private val mapBoxHelper: MapBoxHelper by inject()
+    private var mapBoxMap: MapboxMap? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +43,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListene
         setContentView(R.layout.activity_main)
         mapView = findViewById(R.id.mapView)
         mapView?.onCreate(savedInstanceState)
-        mapView?.getMapAsync(this)
+        boxViewModel.getCarsList {
+            mapView?.getMapAsync(this@MainActivity)
+        }
     }
 
 
@@ -61,19 +69,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListene
 
             enableLocationComponent()
 
-
-
-            setup("blue", LatLng(65.3, 37.9))
-            setup("black", LatLng(55.3, 38.9))
+            val list = mapBoxHelper.getLatLngFromCarsModel(boxViewModel.carsList)
+            if (list.size == 2) {
+                setup("blue", list[0])
+                setup("black", list[1])
+            }
         }
-        this.mapboxMap = mapboxMap
+        this.mapBoxMap = mapboxMap
 
 
     }
 
     private fun setup(iconId: String, latlng: LatLng) {
         val symbolManager = mapView?.let {
-            mapboxMap?.let { it1 ->
+            mapBoxMap?.let { it1 ->
                 it1.style?.let { it2 ->
                     SymbolManager(
                         it,
@@ -92,17 +101,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListene
             SymbolOptions()
                 .withLatLng(latlng)
                 .withIconImage(iconId)
-                .withTextJustify("AAA")
-                .withTextField("Rob")
                 .withIconSize(1.0f)
         )
 
-//        symbolManager?.create(SymbolOptions()
-//                .withLatLng(LatLng(55.751211, 37.618423))
-//                .withIconImage("2")
-//                .withIconSize(2.0f))
         symbolManager?.addClickListener {
+            when (it.iconImage) {
+                "blue" -> {
 
+                }
+                "black" -> {
+
+                }
+            }
             return@addClickListener true
         }
     }
@@ -137,7 +147,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListene
         mapView?.onDestroy()
     }
 
-    @SuppressWarnings("MissingPermission")
+
     private fun enableLocationComponent() {
 
         val locationComponentOptions = LocationComponentOptions.builder(this)
@@ -151,9 +161,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListene
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
 
             // Get an instance of the component
-            val locationComponent = mapboxMap?.locationComponent
+            val locationComponent = mapBoxMap?.locationComponent
 
-            mapboxMap?.getStyle {
+            mapBoxMap?.getStyle {
                 locationComponent?.activateLocationComponent(
                     LocationComponentActivationOptions
                         .builder(this, it)
@@ -165,6 +175,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListene
 
 
             // Enable to make component visible
+            if (ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+
+                return
+            }
             locationComponent?.isLocationComponentEnabled = true
 
             // Set the component's camera mode

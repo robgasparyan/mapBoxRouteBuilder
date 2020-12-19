@@ -1,4 +1,4 @@
-package com.mapbox.mapboxroutebuilder.Models
+package com.mapbox.mapboxroutebuilder.models
 
 
 import com.google.gson.annotations.SerializedName

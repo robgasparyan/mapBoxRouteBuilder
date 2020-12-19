@@ -4,25 +4,30 @@ import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.mapbox.android.core.BuildConfig
-import com.mapbox.mapboxroutebuilder.Repositories.BoxRepository
-import com.mapbox.mapboxroutebuilder.Services.BoxApiService
-import com.mapbox.mapboxroutebuilder.ViewModels.BoxViewModel
+import com.mapbox.mapboxroutebuilder.repositories.BoxRepository
+import com.mapbox.mapboxroutebuilder.services.BoxApiService
+import com.mapbox.mapboxroutebuilder.utils.MapBoxHelper
+import com.mapbox.mapboxroutebuilder.viewModels.BoxViewModel
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.androidx.experimental.dsl.viewModel
 import org.koin.core.module.Module
 import org.koin.dsl.module
-import org.koin.experimental.builder.single
+import org.koin.experimental.builder.factory
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 val appRepositories: Module = module {
-    single<BoxRepository>()
+    factory<BoxRepository>()
 }
 
 val viewModels: Module = module {
     viewModel<BoxViewModel>()
+}
+
+val helpers: Module = module {
+    single { MapBoxHelper() }
 }
 
 val networkModule: Module = module {

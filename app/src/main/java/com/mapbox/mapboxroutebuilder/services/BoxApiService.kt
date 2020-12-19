@@ -1,6 +1,6 @@
-package com.mapbox.mapboxroutebuilder.Services
+package com.mapbox.mapboxroutebuilder.services
 
-import com.mapbox.mapboxroutebuilder.Models.CarsModel
+import com.mapbox.mapboxroutebuilder.models.CarsModel
 import retrofit2.http.GET
 import retrofit2.http.Url
 
