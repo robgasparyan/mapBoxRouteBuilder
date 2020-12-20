@@ -9,4 +9,5 @@ interface BoxApiService {
     @GET
     suspend fun getCarsList(@Url carsUrl: String = "https://raw.githubusercontent.com/Gary111/TrashCan/master/2000_cars.json"): CarsModel
 
+
 }

@@ -1,15 +1,20 @@
 package com.mapbox.mapboxroutebuilder
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
 import android.view.animation.BounceInterpolator
+import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
+import com.mapbox.geojson.Point
 import com.mapbox.mapboxroutebuilder.utils.MapBoxHelper
 import com.mapbox.mapboxroutebuilder.viewModels.BoxViewModel
 import com.mapbox.mapboxsdk.Mapbox
@@ -25,6 +30,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
+import com.mapbox.services.android.navigation.ui.v5.route.NavigationMapRoute
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -35,6 +41,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListene
     private val boxViewModel: BoxViewModel by viewModel()
     private val mapBoxHelper: MapBoxHelper by inject()
     private var mapBoxMap: MapboxMap? = null
+    private var bottomSheet: FrameLayout? = null
+    private var bottomShitBehaviour: BottomSheetBehavior<FrameLayout>? = null
+    private var navigationMapRoute: NavigationMapRoute? = null
+    private var carInfoTextView: AppCompatTextView? = null
+    private var plateNumberTextView: AppCompatTextView? = null
+    private var fuelPercentageTextView: AppCompatTextView? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,6 +58,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListene
         boxViewModel.getCarsList {
             mapView?.getMapAsync(this@MainActivity)
         }
+        initViewComponents()
     }
 
 
@@ -108,13 +121,81 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListene
         symbolManager?.addClickListener {
             when (it.iconImage) {
                 "blue" -> {
+                    if (mapBoxMap != null) {
+                        val originPoint: Point = Point.fromLngLat(
+                            mapBoxMap!!.locationComponent.lastKnownLocation!!.longitude,
+                            mapBoxMap!!.locationComponent.lastKnownLocation!!.latitude
+                        )
+                        val destinationPoint: Point = Point.fromLngLat(
+                            iconIdLatLng[0].second.longitude,
+                            iconIdLatLng[0].second.latitude
+                        )
+
+                        boxViewModel.getDirections(
+                            originPoint,
+                            destinationPoint
+                        ) { directionsRoute ->
+                            if (navigationMapRoute != null) {
+                                navigationMapRoute?.updateRouteVisibilityTo(true)
+                            } else {
+
+                                mapView?.let { view ->
+                                    mapBoxMap?.let { box ->
+                                        navigationMapRoute = NavigationMapRoute(
+                                            null,
+                                            view,
+                                            box,
+                                            R.style.NavigationMapRoute
+                                        )
+                                    }
+                                }
+                            }
+
+                            navigationMapRoute?.addRoute(directionsRoute)
+                        }
+                    }
+
+                    showCarInfo(0)
+
 
                 }
                 "black" -> {
+                    if (mapBoxMap != null) {
+                        val originPoint: Point = Point.fromLngLat(
+                            mapBoxMap!!.locationComponent.lastKnownLocation!!.longitude,
+                            mapBoxMap!!.locationComponent.lastKnownLocation!!.latitude
+                        )
+                        val destinationPoint: Point = Point.fromLngLat(
+                            iconIdLatLng[1].second.longitude,
+                            iconIdLatLng[1].second.latitude
+                        )
+                        boxViewModel.getDirections(
+                            originPoint,
+                            destinationPoint
+                        ) { directionsRoute ->
+                            if (navigationMapRoute != null) {
+                                navigationMapRoute?.updateRouteVisibilityTo(false)
+                            } else {
 
+                                mapView?.let { view ->
+                                    mapBoxMap?.let { box ->
+                                        NavigationMapRoute(
+                                            null,
+                                            view,
+                                            box,
+                                            R.style.NavigationMapRoute
+                                        )
+                                    }
+                                }
+                            }
+
+                            navigationMapRoute?.addRoute(directionsRoute)
+                        }
+
+                    }
+                    showCarInfo(1)
                 }
             }
-            return@addClickListener true
         }
     }
 
@@ -156,7 +237,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListene
             .pulseColor(Color.GREEN)
             .pulseAlpha(.4f)
             .pulseInterpolator(BounceInterpolator())
-            .build();
+            .build()
 
         // Check if permissions are enabled and if not request
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
@@ -223,5 +304,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListene
         PermissionsManager(this).onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
+    private fun initViewComponents() {
+        bottomShitBehaviour = bottomSheet?.let { BottomSheetBehavior.from(it) }
+        carInfoTextView = findViewById(R.id.carInfo)
+        plateNumberTextView = findViewById(R.id.plateNumber)
+        fuelPercentageTextView = findViewById(R.id.fuelPercentage)
+        bottomSheet = findViewById(R.id.bottomSheet)
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun showCarInfo(carId: Int) {
+        carInfoTextView?.text = boxViewModel.carsList[carId].name
+        plateNumberTextView?.text = boxViewModel.carsList[carId].plateNumber
+        fuelPercentageTextView?.text = "${boxViewModel.carsList[carId].fuelPercentage}%"
+        bottomShitBehaviour?.state = BottomSheetBehavior.STATE_EXPANDED
+    }
 
 }

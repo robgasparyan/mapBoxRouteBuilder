@@ -1,5 +1,6 @@
 package com.mapbox.mapboxroutebuilder.DI
 
+
 import androidx.preference.PreferenceManager
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
@@ -71,7 +72,7 @@ val networkModule: Module = module {
 
     // Retrofit
     single {
-        val BASE_URL = "https://raw.githubusercontent.com"
+        val BASE_URL = "https://api.mapbox.com"
         Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create(get<Gson>()))
             .baseUrl(BASE_URL)

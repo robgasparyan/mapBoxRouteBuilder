@@ -1,4 +1,4 @@
-package com.mapbox.mapboxroutebuilder.utils
+package com.mapbox.mapboxroutebuilder.Utils
 
 import androidx.lifecycle.LiveData
 import kotlin.random.Random
