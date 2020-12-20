@@ -1,5 +1,6 @@
 package com.mapbox.mapboxroutebuilder.DI
 
+import androidx.preference.PreferenceManager
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -28,6 +29,7 @@ val viewModels: Module = module {
 
 val helpers: Module = module {
     single { MapBoxHelper() }
+    single { PreferenceManager.getDefaultSharedPreferences(get()) }
 }
 
 val networkModule: Module = module {
