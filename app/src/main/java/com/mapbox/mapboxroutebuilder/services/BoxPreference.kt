@@ -1,21 +1,23 @@
 package com.sfl.rates.services
 
-
 import android.content.SharedPreferences
-
+import com.mapbox.mapboxroutebuilder.models.CarsModel
+import com.mapbox.mapboxroutebuilder.utils.GsonUtils
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
 sealed class BoxPreference<T>(val key: String, val defaultValue: T) : KoinComponent {
 
     val preference: SharedPreferences by inject()
+    val gsonUtils: GsonUtils by inject()
 
-    object putCacheData :
+    object CacheData :
         BoxPreference<String>("cache_data", "") {
 
-//        fun getAsObject(): com.sfl.rates.enums.InterfaceType {
-//            return GsonUtils.getInterfaceEnumFromJson(preference.get(this))
-//        }
+        @Throws(NullPointerException::class)
+        fun getAsObject(): List<CarsModel.CarsModelItem> {
+            return gsonUtils.parseJsonToCarsModel(preference.get(this))
+        }
 
         override fun get(): String {
             return preference.get(this)
@@ -23,24 +25,21 @@ sealed class BoxPreference<T>(val key: String, val defaultValue: T) : KoinCompon
 
         override fun set(json: String) {
             preference.put(this, json)
+            CacheTime.set(System.currentTimeMillis())
         }
 
 
     }
 
-    object putCacheTime :
-        BoxPreference<String>("cache_time", "") {
+    object CacheTime :
+        BoxPreference<Long>("cache_time", 0L) {
 
-//        fun getAsObject(): com.sfl.rates.enums.InterfaceType {
-//            return GsonUtils.getInterfaceEnumFromJson(preference.get(this))
-//        }
-
-        override fun get(): String {
+        override fun get(): Long {
             return preference.get(this)
         }
 
-        override fun set(json: String) {
-            preference.put(this, json)
+        override fun set(long: Long) {
+            preference.put(this, long)
         }
 
 

@@ -7,11 +7,19 @@ import com.sfl.rates.services.BoxPreference
 class CacheService(private val gson: Gson) {
 
     fun cacheData(items: List<CarsModel.CarsModelItem>) {
-        BoxPreference.putCacheData.set(gson.toJson(items))
+        BoxPreference.CacheData.set(gson.toJson(items))
     }
 
     // this method can return empty list, it means cache suicidal time is expired
     fun getCacheData(): List<CarsModel.CarsModelItem> {
-        return emptyList()
+        return try {
+            if (((BoxPreference.CacheTime.get() - System.currentTimeMillis()) / 1000 / 60 / 60) > 1) {
+                emptyList()
+            } else {
+                BoxPreference.CacheData.getAsObject()
+            }
+        } catch (e: NullPointerException) {
+            emptyList()
+        }
     }
 }

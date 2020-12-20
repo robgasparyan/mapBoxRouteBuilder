@@ -13,9 +13,14 @@ class BoxRepository(
 
     fun getCarsList() = liveData(Dispatchers.IO) {
         try {
+            if (cacheLayer.getCacheData().isEmpty()) {
+                emit(Result.success(cacheLayer.getCacheData()))
+                return@liveData
+            }
             val result = boxApiService.getCarsList()
             val twoRandomCarList =
                 listOf(result.getRandomItemFromList(), result.getRandomItemFromList())
+            cacheLayer.cacheData(twoRandomCarList)
             emit(Result.success(twoRandomCarList))
         } catch (e: Exception) {
 //            emit(Result.failure(e))
