@@ -71,8 +71,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListene
 
             val list = mapBoxHelper.getLatLngFromCarsModel(boxViewModel.carsList)
             if (list.size == 2) {
-                setup("blue", list[0])
-                setup("black", list[1])
+                setup(Pair("blue", list[0]), Pair("black", list[1]))
             }
         }
         this.mapBoxMap = mapboxMap
@@ -80,7 +79,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListene
 
     }
 
-    private fun setup(iconId: String, latlng: LatLng) {
+    private fun setup(vararg iconIdLatLng: Pair<String, LatLng>) {
         val symbolManager = mapView?.let {
             mapBoxMap?.let { it1 ->
                 it1.style?.let { it2 ->
@@ -96,13 +95,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListene
         symbolManager?.iconAllowOverlap = true
         symbolManager?.iconIgnorePlacement = true
 
+        iconIdLatLng.forEach {
+            symbolManager?.create(
+                SymbolOptions()
+                    .withLatLng(it.second)
+                    .withIconImage(it.first)
+                    .withIconSize(1.0f)
+            )
+        }
 
-        symbolManager?.create(
-            SymbolOptions()
-                .withLatLng(latlng)
-                .withIconImage(iconId)
-                .withIconSize(1.0f)
-        )
 
         symbolManager?.addClickListener {
             when (it.iconImage) {

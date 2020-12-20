@@ -1,7 +1,7 @@
 package com.mapbox.mapboxroutebuilder.repositories
 
 import androidx.lifecycle.liveData
-import com.mapbox.mapboxroutebuilder.services.BoxApiService
+import com.mapbox.mapboxroutebuilder.services.network.BoxApiService
 import com.mapbox.mapboxroutebuilder.utils.getRandomItemFromList
 import kotlinx.coroutines.Dispatchers
 
