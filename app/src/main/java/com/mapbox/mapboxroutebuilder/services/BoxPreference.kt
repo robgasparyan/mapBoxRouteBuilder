@@ -28,6 +28,24 @@ sealed class BoxPreference<T>(val key: String, val defaultValue: T) : KoinCompon
 
     }
 
+    object putCacheTime :
+        BoxPreference<String>("cache_time", "") {
+
+//        fun getAsObject(): com.sfl.rates.enums.InterfaceType {
+//            return GsonUtils.getInterfaceEnumFromJson(preference.get(this))
+//        }
+
+        override fun get(): String {
+            return preference.get(this)
+        }
+
+        override fun set(json: String) {
+            preference.put(this, json)
+        }
+
+
+    }
+
     abstract fun get(): T
     abstract fun set(value: T)
 

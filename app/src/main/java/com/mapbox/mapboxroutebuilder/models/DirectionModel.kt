@@ -19,7 +19,7 @@ data class DirectionModel(
         @SerializedName("duration")
         val duration: Double,
         @SerializedName("geometry")
-        val geometry: String,
+        val geometry: Geometry,
         @SerializedName("legs")
         val legs: List<Leg>,
         @SerializedName("weight")
@@ -27,6 +27,13 @@ data class DirectionModel(
         @SerializedName("weight_name")
         val weightName: String
     ) {
+        data class Geometry(
+            @SerializedName("coordinates")
+            val coordinates: List<List<Double>>,
+            @SerializedName("type")
+            val type: String
+        )
+
         data class Leg(
             @SerializedName("admins")
             val admins: List<Admin>,

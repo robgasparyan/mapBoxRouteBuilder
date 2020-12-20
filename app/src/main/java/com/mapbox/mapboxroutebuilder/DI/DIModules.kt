@@ -7,6 +7,7 @@ import com.google.gson.GsonBuilder
 import com.mapbox.android.core.BuildConfig
 import com.mapbox.mapboxroutebuilder.repositories.BoxRepository
 import com.mapbox.mapboxroutebuilder.services.network.BoxApiService
+import com.mapbox.mapboxroutebuilder.services.network.CacheService
 import com.mapbox.mapboxroutebuilder.utils.MapBoxHelper
 import com.mapbox.mapboxroutebuilder.viewModels.BoxViewModel
 import okhttp3.OkHttpClient
@@ -29,6 +30,7 @@ val viewModels: Module = module {
 
 val helpers: Module = module {
     single { MapBoxHelper() }
+    single { CacheService(get()) }
     single { PreferenceManager.getDefaultSharedPreferences(get()) }
 }
 

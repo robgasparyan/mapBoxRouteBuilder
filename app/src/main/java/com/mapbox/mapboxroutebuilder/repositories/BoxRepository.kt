@@ -2,10 +2,14 @@ package com.mapbox.mapboxroutebuilder.repositories
 
 import androidx.lifecycle.liveData
 import com.mapbox.mapboxroutebuilder.services.network.BoxApiService
+import com.mapbox.mapboxroutebuilder.services.network.CacheService
 import com.mapbox.mapboxroutebuilder.utils.getRandomItemFromList
 import kotlinx.coroutines.Dispatchers
 
-class BoxRepository(private val boxApiService: BoxApiService) {
+class BoxRepository(
+    private val boxApiService: BoxApiService,
+    private val cacheLayer: CacheService
+) {
 
     fun getCarsList() = liveData(Dispatchers.IO) {
         try {
